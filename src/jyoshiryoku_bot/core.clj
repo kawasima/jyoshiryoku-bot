@@ -39,9 +39,14 @@
   (with-open [fout (io/writer "tweet.txt" :append true)]
     (.write fout (apply pr-str (getmytweet))))
   (kaiseki/init "tweet.txt")
-  (when true
-    (let [info (mentionInfo)]
-      (if (= "syobochim" (:userName info))
-        (tweettimeline (str "@" (:userName info) " "
-                            (kaiseki/create-sentence @kaiseki/*words* (searchword))))))
-    (Thread/sleep (* 1000 60 10))))
+  (let [current-info (atom nil)]
+    (when true
+      (let [info (mentionInfo)]
+        (when (= "syobochim" (:userName info))
+          (tweettimeline (str "@" (:userName info) " "
+                              (kaiseki/create-sentence @kaiseki/*words* (searchword))))
+          (if (= info @current-info)
+            (reset! current-info info))))
+      (Thread/sleep (* 1000 60 10)))))
+  
+  
